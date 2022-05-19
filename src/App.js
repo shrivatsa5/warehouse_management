@@ -44,10 +44,19 @@ class App extends React.Component {
   //below call back will be passed to button component as well Modal Component to toggle modals view
   toggleModalView(shapeFormodal) {
     console.log(this, shapeFormodal);
-    this.setState({
-      isModalVisible: this.state.isModalVisible === true ? false : true,
-      shapeFormodal: shapeFormodal,
-    });
+
+    if (this.state.isModalVisible) {
+      console.log('modal is open and will close it now');
+      this.setState({
+        isModalVisible: false,
+      });
+    } else {
+      console.log('modal is currently closed, opening now');
+      this.setState({
+        isModalVisible: true,
+        shapeFormodal: shapeFormodal,
+      });
+    }
   }
 
   //below function will be passed as a callback to Modal component and will add either outerWareHouse object or inner SKU
@@ -58,22 +67,18 @@ class App extends React.Component {
     //first check whether outerWarehouse object in this.state is null or not
     //if null create outerWareHouse Object
     //else create Storageunit and add it to OuterWareHouse
-
-    this.setState({
-      isModalVisible: this.state.isModalVisible === true ? false : true,
-    });
+    this.toggleModalView();
   }
 
   render() {
     return (
       <div>
-        {this.state.isModalVisible == true ? (
-          <ModalComponent
-            callbackFn={this.createShapeOnCanvas}
-            shapeType={this.state.shapeFormodal}
-            isModalVisible={this.state.isModalVisible}
-          />
-        ) : null}
+        <ModalComponent
+          callbackFn={this.createShapeOnCanvas}
+          shapeType={this.state.shapeFormodal}
+          isModalVisible={this.state.isModalVisible}
+        />
+
         <div className='floatleft'>
           <Stage
             width={this.state.height}
