@@ -1,5 +1,5 @@
 /**
- * Abstract Class Animal.
+ * Abstract Class GeneralShape.
  *
  * @class GeneralShape
  */
@@ -27,4 +27,4 @@ class GeneralShape {
   };
 }
 
-module.exports = GeneralShape;
+export default GeneralShape;

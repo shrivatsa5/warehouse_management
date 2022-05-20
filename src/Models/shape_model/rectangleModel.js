@@ -1,4 +1,4 @@
-import { GeneralShape } from './generalShapeProperties';
+import GeneralShape from './generalShapeProperties';
 
 class RectangleModel extends GeneralShape {
   constructor(id, posX, posY, height, width, color, rotation) {
@@ -11,4 +11,4 @@ class RectangleModel extends GeneralShape {
 
   handleDragEnd() {}
 }
-module.exports = RectangleModel;
+export default RectangleModel;

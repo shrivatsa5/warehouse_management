@@ -4,7 +4,9 @@ class WarehouseBorder {
     this.skuList = [];
   }
 
-  addNewSkuToList() {}
+  addNewSkuToList(skuUnit) {
+    this.skuList.push(skuUnit);
+  }
 
   deleteSkuFromList() {}
 }

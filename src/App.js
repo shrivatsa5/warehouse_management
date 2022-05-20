@@ -1,8 +1,11 @@
 import './App.css';
-import { Stage, Layer, Text, Circle } from 'react-konva';
+import { Stage, Layer, Text, Rect } from 'react-konva';
 import React from 'react';
 import { ButtonGroup, Button } from '@material-ui/core';
 import ModalComponent from './Components/modal';
+import WarehouseBorder from './Models/state_models/outerShapeModels';
+import StorageUnit from './Models/state_models/skuShapeModel';
+import RectangleModel from './Models/shape_model/rectangleModel';
 
 class App extends React.Component {
   constructor() {
@@ -13,16 +16,19 @@ class App extends React.Component {
       width: 0,
       isModalVisible: false,
       outerWareHouseObj: null,
+      skuUnit: null,
 
       //experimental
       shapeFormodal: 'rectangle',
+      isCreatingWarehouseBorder: true,
     };
 
     //write a function which looks whether any stored outerWarehouse object available or not
 
     window.addEventListener('resize', this.update);
 
-    this.toggleModalView = this.toggleModalView.bind(this);
+    this.showModalView = this.showModalView.bind(this);
+    this.closeModalView = this.closeModalView.bind(this);
     this.createShapeOnCanvas = this.createShapeOnCanvas.bind(this);
   }
 
@@ -41,17 +47,15 @@ class App extends React.Component {
     });
   };
 
-  //below call back will be passed to button component as well Modal Component to toggle modals view
-  toggleModalView(shapeFormodal) {
-    console.log(this, shapeFormodal);
-
-    if (this.state.isModalVisible) {
-      console.log('modal is open and will close it now');
+  //below call back will be passed to button component as well Modal Component to show modals view
+  showModalView(shapeFormodal) {
+    if (this.state.outerWareHouseObj) {
       this.setState({
-        isModalVisible: false,
+        isModalVisible: true,
+        shapeFormodal: shapeFormodal,
+        isCreatingWarehouseBorder: false,
       });
     } else {
-      console.log('modal is currently closed, opening now');
       this.setState({
         isModalVisible: true,
         shapeFormodal: shapeFormodal,
@@ -59,15 +63,50 @@ class App extends React.Component {
     }
   }
 
-  //below function will be passed as a callback to Modal component and will add either outerWareHouse object or inner SKU
-  createShapeOnCanvas() {
-    console.log('this callback function creates shape');
-    console.log(this);
+  closeModalView() {
+    this.setState({
+      isModalVisible: false,
+    });
+  }
 
-    //first check whether outerWarehouse object in this.state is null or not
-    //if null create outerWareHouse Object
-    //else create Storageunit and add it to OuterWareHouse
-    this.toggleModalView();
+  //function takes shapeType and returns shapeModel
+  getShapeModel(infoFromModalInputs) {
+    var MAX_RANGE = 10000;
+
+    if (infoFromModalInputs.shapeType === 'rectangle') {
+      console.log(typeof infoFromModalInputs.length);
+      return new RectangleModel(
+        Math.random() * MAX_RANGE,
+        Math.random() * this.state.width,
+        Math.random() * this.state.height,
+        infoFromModalInputs.length,
+        infoFromModalInputs.width,
+        'orange'
+      );
+    }
+  }
+
+  //below function will be passed as a callback to Modal component and will add either outerWareHouse object or inner SKU
+  createShapeOnCanvas(infoFromModalInputs) {
+    this.closeModalView();
+    if (!this.state.outerWareHouseObj) {
+      console.log('outer warehouse not designed');
+      console.log(infoFromModalInputs);
+      var shapeModel = this.getShapeModel(infoFromModalInputs);
+      var outerWareHouseObjTemp = new WarehouseBorder(shapeModel);
+      this.setState({
+        outerWareHouseObj: outerWareHouseObjTemp,
+      });
+    } else {
+      console.log('warehouse is created already. append this sku to it');
+      console.log(infoFromModalInputs.shapeType);
+      var skuUnit = new StorageUnit(infoFromModalInputs.shapeType, 'biscuit');
+      var outerWarehouseObjTemp = this.state.outerWareHouseObj;
+      outerWarehouseObjTemp.addNewSkuToList(skuUnit);
+      this.setState({
+        outerWareHouseObj: outerWarehouseObjTemp,
+      });
+    }
   }
 
   render() {
@@ -77,6 +116,7 @@ class App extends React.Component {
           callbackFn={this.createShapeOnCanvas}
           shapeType={this.state.shapeFormodal}
           isModalVisible={this.state.isModalVisible}
+          isCreatingWareHouse={this.state.isCreatingWarehouseBorder}
         />
 
         <div className='floatleft'>
@@ -89,7 +129,22 @@ class App extends React.Component {
               overflow: 'hidden',
             }}
           >
-            <Layer></Layer>
+            <Layer>
+              {this.state.outerWareHouseObj != null ? (
+                <Rect
+                  x={100}
+                  y={100}
+                  width={parseInt(
+                    this.state.outerWareHouseObj.shapeModel.width
+                  )}
+                  height={parseInt(
+                    this.state.outerWareHouseObj.shapeModel.height
+                  )}
+                  fill='red'
+                  shadowBlur={10}
+                />
+              ) : null}
+            </Layer>
           </Stage>
         </div>
         <div className='floatright'>
@@ -101,13 +156,25 @@ class App extends React.Component {
             >
               <Button
                 onClick={(e) => {
-                  this.toggleModalView('square');
+                  this.showModalView('square');
                 }}
               >
                 Square
               </Button>
-              <Button>Rectangle</Button>
-              <Button>Circle</Button>
+              <Button
+                onClick={(e) => {
+                  this.showModalView('rectangle');
+                }}
+              >
+                Rectangle
+              </Button>
+              <Button
+                onClick={(e) => {
+                  this.showModalView('circle');
+                }}
+              >
+                Circle
+              </Button>
             </ButtonGroup>
           </div>
         </div>

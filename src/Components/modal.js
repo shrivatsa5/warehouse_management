@@ -1,43 +1,151 @@
 import React from 'react';
-import { Modal, Box, Input, Button } from '@material-ui/core';
+import Box from '@mui/material/Box';
+
+import Modal from '@mui/material/Modal';
 
 class ModalComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      length: null,
-      width: null,
+      length: 0,
+      width: 0,
       radius: null,
     };
 
     this.handleModalSubmit = this.handleModalSubmit.bind(this);
-    console.log('creating modal ', this.isModalVisible);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   handleModalSubmit(e) {
     e.preventDefault();
+    var infoToSend = { ...this.state, ...this.props };
+    this.props.callbackFn(infoToSend);
+  }
 
-    this.props.callbackFn();
+  handleChange(e) {
+    const { value, name } = e.target;
+    this.setState((prevState) => {
+      if (name === 'length') {
+        return {
+          width: prevState.width,
+          radius: prevState.radius,
+          length: value,
+          shapeType: prevState.shapeType,
+          callbackFn: prevState.callbackFn,
+          isModalVisible: prevState.isModalVisible,
+        };
+      } else if (name === 'width') {
+        return {
+          width: value,
+          radius: prevState.radius,
+          length: prevState.length,
+          shapeType: prevState.shapeType,
+          callbackFn: prevState.callbackFn,
+          isModalVisible: prevState.isModalVisible,
+        };
+      } else {
+        return {
+          width: prevState.width,
+          radius: value,
+          length: prevState.length,
+          shapeType: prevState.shapeType,
+          callbackFn: prevState.callbackFn,
+          isModalVisible: prevState.isModalVisible,
+        };
+      }
+    });
   }
 
   render() {
+    const style = {
+      position: 'absolute',
+      top: '40%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      border: '3px solid #000',
+      boxShadow: 24,
+      p: 4,
+    };
     const ariaLabel = { 'aria-label': 'description' };
-
     return (
       <div>
         <Modal
           open={this.props.isModalVisible}
           aria-labelledby='modal-modal-title'
           aria-describedby='modal-modal-description'
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          <Box>
-            <Input defaultValue='Hello world' inputProps={ariaLabel} />
-            <Button onClick={this.handleModalSubmit}>Submit</Button>
+          <Box
+            sx={{
+              width: 400,
+              bgcolor: 'background.paper',
+              border: '3px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <form onSubmit={this.handleModalSubmit}>
+              <div>
+                {this.props.shapeType === 'circle' && (
+                  <div>
+                    <label>
+                      Radius:
+                      <div>
+                        <input
+                          type='text'
+                          name='radius'
+                          value={this.state.radius}
+                          onChange={this.handleChange}
+                        />
+                      </div>
+                    </label>
+                  </div>
+                )}
+                {(this.props.shapeType === 'square' ||
+                  this.props.shapeType === 'rectangle') && (
+                  <div>
+                    <label>
+                      Length
+                      <div>
+                        <input
+                          type='number'
+                          name='length'
+                          value={this.state.length}
+                          onChange={this.handleChange}
+                        />
+                      </div>
+                    </label>
+                  </div>
+                )}
+                {this.props.shapeType === 'rectangle' && (
+                  <div>
+                    <label>
+                      Width:
+                      <div>
+                        <input
+                          type='number'
+                          name='width'
+                          value={this.state.width}
+                          onChange={this.handleChange}
+                        />
+                      </div>
+                    </label>
+                  </div>
+                )}
+              </div>
+              <br></br>
+              <button>Submit</button>
+            </form>
           </Box>
         </Modal>
       </div>
     );
   }
 }
-
 export default ModalComponent;
