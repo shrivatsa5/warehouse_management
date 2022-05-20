@@ -127,25 +127,38 @@ class App extends React.Component {
 
   //below function will be passed as a callback to Modal component and will add either outerWareHouse object or inner SKU
   createShapeOnCanvas(infoFromModalInputs) {
+    //below line closes the modal
     this.closeModalView();
+
     if (!this.state.outerWareHouseObj) {
       console.log('outer warehouse not designed');
       console.log(infoFromModalInputs);
+
       var shapeModel = getShapeModel({
         shapeType: infoFromModalInputs.shapeType,
         length: infoFromModalInputs.length,
         width: infoFromModalInputs.width,
         radius: infoFromModalInputs.radius,
         state: this.state,
+        isForWareHouseBorder: true,
       });
+
       var outerWareHouseObjTemp = new WarehouseBorder(shapeModel);
       this.setState({
         outerWareHouseObj: outerWareHouseObjTemp,
       });
     } else {
       console.log('warehouse is created already. append this sku to it');
-      console.log(infoFromModalInputs.shapeType);
-      var skuUnit = new StorageUnit(infoFromModalInputs.shapeType, 'biscuit');
+      console.log();
+      var shapeModel = getShapeModel({
+        shapeType: infoFromModalInputs.shapeType,
+        length: infoFromModalInputs.length,
+        width: infoFromModalInputs.width,
+        radius: infoFromModalInputs.radius,
+        state: this.state,
+        isForWareHouseBorder: false,
+      });
+      var skuUnit = new StorageUnit(shapeModel, 'biscuit');
       var outerWarehouseObjTemp = this.state.outerWareHouseObj;
       outerWarehouseObjTemp.addNewSkuToList(skuUnit);
       this.setState({
