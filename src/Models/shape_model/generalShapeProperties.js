@@ -17,14 +17,6 @@ class GeneralShape {
     this.rotation = rotation;
     this.isDragging = isDragging;
   }
-
-  handleDragStart = (e) => {
-    throw new Error('method must be implimented in subclass');
-  };
-
-  handleDragEnd = () => {
-    throw new Error('method must be implimented in subclass');
-  };
 }
 
 export default GeneralShape;

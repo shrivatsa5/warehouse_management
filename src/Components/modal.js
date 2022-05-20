@@ -9,7 +9,7 @@ class ModalComponent extends React.Component {
     this.state = {
       length: 0,
       width: 0,
-      radius: null,
+      radius: 0,
     };
 
     this.handleModalSubmit = this.handleModalSubmit.bind(this);
@@ -18,6 +18,8 @@ class ModalComponent extends React.Component {
 
   handleModalSubmit(e) {
     e.preventDefault();
+
+    //TODO - need to find way to pass only props.shapeType
     var infoToSend = { ...this.state, ...this.props };
     this.props.callbackFn(infoToSend);
   }

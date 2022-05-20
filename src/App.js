@@ -1,11 +1,13 @@
 import './App.css';
-import { Stage, Layer, Text, Rect } from 'react-konva';
 import React from 'react';
-import { ButtonGroup, Button } from '@material-ui/core';
+
 import ModalComponent from './Components/modal';
+import CanvasComponent from './Components/canvas';
+import MenuCompponent from './Components/menuComponent';
+
 import WarehouseBorder from './Models/state_models/outerShapeModels';
 import StorageUnit from './Models/state_models/skuShapeModel';
-import RectangleModel from './Models/shape_model/rectangleModel';
+import getShapeModel from './utilityFunctions';
 
 class App extends React.Component {
   constructor() {
@@ -30,6 +32,8 @@ class App extends React.Component {
     this.showModalView = this.showModalView.bind(this);
     this.closeModalView = this.closeModalView.bind(this);
     this.createShapeOnCanvas = this.createShapeOnCanvas.bind(this);
+    this.handleDragStart = this.handleDragStart.bind(this);
+    this.handleDragEnd = this.handleDragEnd.bind(this);
   }
 
   componentDidMount() {
@@ -69,20 +73,55 @@ class App extends React.Component {
     });
   }
 
-  //function takes shapeType and returns shapeModel
-  getShapeModel(infoFromModalInputs) {
-    var MAX_RANGE = 10000;
-
-    if (infoFromModalInputs.shapeType === 'rectangle') {
-      console.log(typeof infoFromModalInputs.length);
-      return new RectangleModel(
-        Math.random() * MAX_RANGE,
-        Math.random() * this.state.width,
-        Math.random() * this.state.height,
-        infoFromModalInputs.length,
-        infoFromModalInputs.width,
-        'orange'
-      );
+  //
+  handleDragStart(e) {
+    console.log('dragging started..');
+    const id = e.target.id();
+    var outerWareHouseObjTemp = this.state.outerWareHouseObj;
+    if (id === outerWareHouseObjTemp.shapeModel.id) {
+      // we are dragging the outerwarehouseObj
+      outerWareHouseObjTemp.shapeModel.isDragging = true;
+      this.setState({
+        outerWareHouseObj: outerWareHouseObjTemp,
+      });
+    } else {
+      //we are dragging inner SKUs
+      var innerSkuLists = outerWareHouseObjTemp.skuList;
+      innerSkuLists = innerSkuLists.map((skuUnit) => {
+        if (id === skuUnit.shapeModel.id) {
+          skuUnit.shapeModel.isDragging = true;
+        }
+        return skuUnit;
+      });
+      outerWareHouseObjTemp.skuList = innerSkuLists;
+      this.setState({
+        outerWareHouseObj: outerWareHouseObjTemp,
+      });
+    }
+  }
+  handleDragEnd(e) {
+    console.log('dragging ended..');
+    const id = e.target.id();
+    var outerWareHouseObjTemp = this.state.outerWareHouseObj;
+    if (id === outerWareHouseObjTemp.shapeModel.id) {
+      // we are dragging the outerwarehouseObj
+      outerWareHouseObjTemp.shapeModel.isDragging = false;
+      this.setState({
+        outerWareHouseObj: outerWareHouseObjTemp,
+      });
+    } else {
+      //we are dragging inner SKUs
+      var innerSkuLists = outerWareHouseObjTemp.skuList;
+      innerSkuLists = innerSkuLists.map((skuUnit) => {
+        if (id === skuUnit.shapeModel.id) {
+          skuUnit.shapeModel.isDragging = false;
+        }
+        return skuUnit;
+      });
+      outerWareHouseObjTemp.skuList = innerSkuLists;
+      this.setState({
+        outerWareHouseObj: outerWareHouseObjTemp,
+      });
     }
   }
 
@@ -92,7 +131,13 @@ class App extends React.Component {
     if (!this.state.outerWareHouseObj) {
       console.log('outer warehouse not designed');
       console.log(infoFromModalInputs);
-      var shapeModel = this.getShapeModel(infoFromModalInputs);
+      var shapeModel = getShapeModel({
+        shapeType: infoFromModalInputs.shapeType,
+        length: infoFromModalInputs.length,
+        width: infoFromModalInputs.width,
+        radius: infoFromModalInputs.radius,
+        state: this.state,
+      });
       var outerWareHouseObjTemp = new WarehouseBorder(shapeModel);
       this.setState({
         outerWareHouseObj: outerWareHouseObjTemp,
@@ -111,72 +156,22 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className='wrap'>
         <ModalComponent
           callbackFn={this.createShapeOnCanvas}
           shapeType={this.state.shapeFormodal}
           isModalVisible={this.state.isModalVisible}
           isCreatingWareHouse={this.state.isCreatingWarehouseBorder}
         />
-
         <div className='floatleft'>
-          <Stage
-            width={this.state.height}
-            height={this.state.width}
-            style={{
-              backgroundColor: 'pink',
-              borderRadius: '15px',
-              overflow: 'hidden',
-            }}
-          >
-            <Layer>
-              {this.state.outerWareHouseObj != null ? (
-                <Rect
-                  x={100}
-                  y={100}
-                  width={parseInt(
-                    this.state.outerWareHouseObj.shapeModel.width
-                  )}
-                  height={parseInt(
-                    this.state.outerWareHouseObj.shapeModel.height
-                  )}
-                  fill='red'
-                  shadowBlur={10}
-                />
-              ) : null}
-            </Layer>
-          </Stage>
+          <CanvasComponent
+            state={this.state}
+            handleDragStart={this.handleDragStart}
+            handleDragEnd={this.handleDragEnd}
+          />
         </div>
         <div className='floatright'>
-          <div>
-            <ButtonGroup
-              variant='contained'
-              aria-label='outlined primary button group'
-              orientation='vertical'
-            >
-              <Button
-                onClick={(e) => {
-                  this.showModalView('square');
-                }}
-              >
-                Square
-              </Button>
-              <Button
-                onClick={(e) => {
-                  this.showModalView('rectangle');
-                }}
-              >
-                Rectangle
-              </Button>
-              <Button
-                onClick={(e) => {
-                  this.showModalView('circle');
-                }}
-              >
-                Circle
-              </Button>
-            </ButtonGroup>
-          </div>
+          <MenuCompponent showModalView={this.showModalView} />
         </div>
       </div>
     );
