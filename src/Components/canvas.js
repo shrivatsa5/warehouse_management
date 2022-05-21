@@ -1,14 +1,23 @@
 import { Stage, Layer, Rect, Circle } from 'react-konva';
 const CanvasComponent = (props) => {
   //defining a utility function which after taking necessary data as input returns konva rectangle or circle object
-  const getKonvaCoreShapes = (shape, id, height, width, radius, color) => {
+  const getKonvaCoreShapes = (
+    shape,
+    id,
+    height,
+    width,
+    radius,
+    color,
+    posX,
+    posY
+  ) => {
     if (shape === 'rectangle') {
       return (
         <Rect
           draggable
           id={id}
-          x={40}
-          y={50}
+          x={parseInt(posX)}
+          y={parseInt(posY)}
           width={parseInt(width)}
           height={parseInt(height)}
           fill={color}
@@ -20,11 +29,14 @@ const CanvasComponent = (props) => {
     } else {
       return (
         <Circle
+          id={id}
           draggable
-          x={200}
-          y={100}
+          x={parseInt(posX)}
+          y={parseInt(posY)}
           radius={parseInt(radius)}
           fill={color}
+          onDragStart={props.handleDragStart}
+          onDragEnd={props.handleDragEnd}
         />
       );
     }
@@ -54,7 +66,9 @@ const CanvasComponent = (props) => {
                   props.state.outerWareHouseObj.shapeModel.height,
                   props.state.outerWareHouseObj.shapeModel.width,
                   null,
-                  'red'
+                  'red',
+                  props.state.outerWareHouseObj.shapeModel.posX,
+                  props.state.outerWareHouseObj.shapeModel.posY
                 );
               } else if (
                 props.state.outerWareHouseObj.shapeModel.shapeType === 'circle'
@@ -65,7 +79,9 @@ const CanvasComponent = (props) => {
                   null,
                   null,
                   props.state.outerWareHouseObj.shapeModel.radius,
-                  'blue'
+                  'blue',
+                  props.state.outerWareHouseObj.shapeModel.posX,
+                  props.state.outerWareHouseObj.shapeModel.posY
                 );
               }
             })()
@@ -73,22 +89,28 @@ const CanvasComponent = (props) => {
         {props.state.outerWareHouseObj != null
           ? props.state.outerWareHouseObj.skuList.map((skuUnit) => {
               if (skuUnit.shapeModel.shapeType === 'rectangle') {
+                console.log('rendering rectangle');
                 return getKonvaCoreShapes(
                   'rectangle',
-                  skuUnit.id,
-                  skuUnit.height,
-                  skuUnit.width,
+                  skuUnit.shapeModel.id,
+                  skuUnit.shapeModel.height,
+                  skuUnit.shapeModel.width,
                   null,
-                  'red'
+                  'red',
+                  skuUnit.shapeModel.posX,
+                  skuUnit.shapeModel.posY
                 );
               } else if (skuUnit.shapeModel.shapeType === 'circle') {
+                console.log('rendering circle');
                 return getKonvaCoreShapes(
                   'circle',
-                  skuUnit.id,
+                  skuUnit.shapeModel.id,
                   null,
                   null,
-                  skuUnit.radius,
-                  'blue'
+                  skuUnit.shapeModel.radius,
+                  'blue',
+                  skuUnit.shapeModel.posX,
+                  skuUnit.shapeModel.posY
                 );
               }
               return null;
