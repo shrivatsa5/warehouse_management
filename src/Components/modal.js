@@ -1,7 +1,7 @@
-import React from 'react';
-import Box from '@mui/material/Box';
+import React from "react";
+import Box from "@mui/material/Box";
 
-import Modal from '@mui/material/Modal';
+import Modal from "@mui/material/Modal";
 
 class ModalComponent extends React.Component {
   constructor(props) {
@@ -10,6 +10,7 @@ class ModalComponent extends React.Component {
       length: 0,
       width: 0,
       radius: 0,
+      item: ""
     };
 
     this.handleModalSubmit = this.handleModalSubmit.bind(this);
@@ -27,16 +28,16 @@ class ModalComponent extends React.Component {
   handleChange(e) {
     const { value, name } = e.target;
     this.setState((prevState) => {
-      if (name === 'length') {
+      if (name === "length") {
         return {
           width: prevState.width,
           radius: prevState.radius,
           length: value,
           shapeType: prevState.shapeType,
           callbackFn: prevState.callbackFn,
-          isModalVisible: prevState.isModalVisible,
+          isModalVisible: prevState.isModalVisible
         };
-      } else if (name === 'width') {
+      } else if (name === "width") {
         return {
           width: value,
           radius: prevState.radius,
@@ -44,8 +45,9 @@ class ModalComponent extends React.Component {
           shapeType: prevState.shapeType,
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
+          item: prevState.item
         };
-      } else {
+      } else if (name === "radius") {
         return {
           width: prevState.width,
           radius: value,
@@ -53,6 +55,17 @@ class ModalComponent extends React.Component {
           shapeType: prevState.shapeType,
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
+          item: prevState.item
+        };
+      } else {
+        return {
+          width: prevState.width,
+          radius: prevState.radius,
+          length: prevState.length,
+          shapeType: prevState.shapeType,
+          callbackFn: prevState.callbackFn,
+          isModalVisible: prevState.isModalVisible,
+          item: value
         };
       }
     });
@@ -60,48 +73,48 @@ class ModalComponent extends React.Component {
 
   render() {
     const style = {
-      position: 'absolute',
-      top: '40%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
+      position: "absolute",
+      top: "40%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
       width: 400,
-      bgcolor: 'background.paper',
-      border: '3px solid #000',
+      bgcolor: "background.paper",
+      border: "3px solid #000",
       boxShadow: 24,
-      p: 4,
+      p: 4
     };
-    const ariaLabel = { 'aria-label': 'description' };
+    const ariaLabel = { "aria-label": "description" };
     return (
       <div>
         <Modal
           open={this.props.isModalVisible}
-          aria-labelledby='modal-modal-title'
-          aria-describedby='modal-modal-description'
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
           }}
         >
           <Box
             sx={{
               width: 400,
-              bgcolor: 'background.paper',
-              border: '3px solid #000',
+              bgcolor: "background.paper",
+              border: "3px solid #000",
               boxShadow: 24,
-              p: 4,
+              p: 4
             }}
           >
             <form onSubmit={this.handleModalSubmit}>
               <div>
-                {this.props.shapeType === 'circle' && (
+                {this.props.shapeType === "circle" && (
                   <div>
                     <label>
                       Radius:
                       <div>
                         <input
-                          type='text'
-                          name='radius'
+                          type="text"
+                          name="radius"
                           value={this.state.radius}
                           onChange={this.handleChange}
                         />
@@ -109,15 +122,15 @@ class ModalComponent extends React.Component {
                     </label>
                   </div>
                 )}
-                {(this.props.shapeType === 'square' ||
-                  this.props.shapeType === 'rectangle') && (
+                {(this.props.shapeType === "square" ||
+                  this.props.shapeType === "rectangle") && (
                   <div>
                     <label>
                       Length
                       <div>
                         <input
-                          type='number'
-                          name='length'
+                          type="number"
+                          name="length"
                           value={this.state.length}
                           onChange={this.handleChange}
                         />
@@ -125,14 +138,14 @@ class ModalComponent extends React.Component {
                     </label>
                   </div>
                 )}
-                {this.props.shapeType === 'rectangle' && (
+                {this.props.shapeType === "rectangle" && (
                   <div>
                     <label>
                       Width:
                       <div>
                         <input
-                          type='number'
-                          name='width'
+                          type="number"
+                          name="width"
                           value={this.state.width}
                           onChange={this.handleChange}
                         />
@@ -141,6 +154,22 @@ class ModalComponent extends React.Component {
                   </div>
                 )}
               </div>
+              <br></br>
+              {!this.props.isCreatingWareHouse && (
+                <div>
+                  <label>
+                    Item:
+                    <div>
+                      <input
+                        type="text"
+                        name="item"
+                        value={this.state.item}
+                        onChange={this.handleChange}
+                      />
+                    </div>
+                  </label>
+                </div>
+              )}
               <br></br>
               <button>Submit</button>
             </form>

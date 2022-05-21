@@ -1,39 +1,47 @@
-import './App.css';
-import React from 'react';
+import "./App.css";
+import React from "react";
 
-import ModalComponent from './Components/modal';
-import CanvasComponent from './Components/canvas';
-import MenuCompponent from './Components/menuComponent';
+import ModalComponent from "./Components/modal";
+import CanvasComponent from "./Components/canvas";
+import MenuCompponent from "./Components/menuComponent";
 
-import WarehouseBorder from './Models/state_models/outerShapeModels';
-import StorageUnit from './Models/state_models/skuShapeModel';
-import getShapeModel from './utilityFunctions';
+import WarehouseBorder from "./Models/state_models/outerShapeModels";
+import StorageUnit from "./Models/state_models/skuShapeModel";
+import getShapeModel from "./utilityFunctions";
 
 class App extends React.Component {
   constructor() {
     super();
-
+    var outerWareHouseObjLocal =
+      JSON.parse(localStorage.getItem("outerWareHouseObj")) || null;
+    console.log("from Local storage");
+    if (outerWareHouseObjLocal)
+      console.log(
+        outerWareHouseObjLocal.shapeModel.posX,
+        outerWareHouseObjLocal.shapeModel.posY
+      );
     this.state = {
       height: 0,
       width: 0,
       isModalVisible: false,
-      outerWareHouseObj: null,
+      outerWareHouseObj: outerWareHouseObjLocal,
       skuUnit: null,
 
       //experimental
-      shapeFormodal: 'rectangle',
-      isCreatingWarehouseBorder: true,
+      shapeFormodal: "rectangle",
+      isCreatingWarehouseBorder: true
     };
 
     //write a function which looks whether any stored outerWarehouse object available or not
 
-    window.addEventListener('resize', this.update);
+    window.addEventListener("resize", this.update);
 
     this.showModalView = this.showModalView.bind(this);
     this.closeModalView = this.closeModalView.bind(this);
     this.createShapeOnCanvas = this.createShapeOnCanvas.bind(this);
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
+    this.handleSave = this.handleSave.bind(this);
   }
 
   componentDidMount() {
@@ -41,13 +49,13 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.update);
+    window.removeEventListener("resize", this.update);
   }
 
   update = () => {
     this.setState({
       height: window.innerHeight,
-      width: window.innerWidth,
+      width: window.innerWidth
     });
   };
 
@@ -57,32 +65,44 @@ class App extends React.Component {
       this.setState({
         isModalVisible: true,
         shapeFormodal: shapeFormodal,
-        isCreatingWarehouseBorder: false,
+        isCreatingWarehouseBorder: false
       });
     } else {
       this.setState({
         isModalVisible: true,
-        shapeFormodal: shapeFormodal,
+        shapeFormodal: shapeFormodal
       });
     }
   }
 
+  handleSave() {
+    console.log("save button clicked");
+    console.log(
+      this.state.outerWareHouseObj.shapeModel.posX,
+      this.state.outerWareHouseObj.shapeModel.posY
+    );
+    localStorage.setItem(
+      "outerWareHouseObj",
+      JSON.stringify(this.state.outerWareHouseObj)
+    );
+  }
+
   closeModalView() {
     this.setState({
-      isModalVisible: false,
+      isModalVisible: false
     });
   }
 
   //
   handleDragStart(e) {
-    console.log('dragging started..');
+    console.log("dragging started..");
     const id = e.target.id();
     var outerWareHouseObjTemp = this.state.outerWareHouseObj;
     if (id === outerWareHouseObjTemp.shapeModel.id) {
       // we are dragging the outerwarehouseObj
       outerWareHouseObjTemp.shapeModel.isDragging = true;
       this.setState({
-        outerWareHouseObj: outerWareHouseObjTemp,
+        outerWareHouseObj: outerWareHouseObjTemp
       });
     } else {
       //we are dragging inner SKUs
@@ -95,20 +115,30 @@ class App extends React.Component {
       });
       outerWareHouseObjTemp.skuList = innerSkuLists;
       this.setState({
-        outerWareHouseObj: outerWareHouseObjTemp,
+        outerWareHouseObj: outerWareHouseObjTemp
       });
     }
   }
   handleDragEnd(e) {
-    console.log('dragging ended..');
     const id = e.target.id();
+    //console.log(e.currentTarget.getX());
+
     var outerWareHouseObjTemp = this.state.outerWareHouseObj;
     if (id === outerWareHouseObjTemp.shapeModel.id) {
       // we are dragging the outerwarehouseObj
+
       outerWareHouseObjTemp.shapeModel.isDragging = false;
+      outerWareHouseObjTemp.shapeModel.posX= e.currentTarget.getX();
+      outerWareHouseObjTemp.shapeModel.posY= e.currentTarget.getY();
+
       this.setState({
-        outerWareHouseObj: outerWareHouseObjTemp,
+        outerWareHouseObj: outerWareHouseObjTemp
       });
+      console.log("dragging ended..");
+      console.log(
+        this.state.outerWareHouseObj.shapeModel.posX,
+        this.state.outerWareHouseObj.shapeModel.posY
+      );
     } else {
       //we are dragging inner SKUs
       var innerSkuLists = outerWareHouseObjTemp.skuList;
@@ -120,7 +150,7 @@ class App extends React.Component {
       });
       outerWareHouseObjTemp.skuList = innerSkuLists;
       this.setState({
-        outerWareHouseObj: outerWareHouseObjTemp,
+        outerWareHouseObj: outerWareHouseObjTemp
       });
     }
   }
@@ -129,7 +159,7 @@ class App extends React.Component {
   createShapeOnCanvas(infoFromModalInputs) {
     this.closeModalView();
     if (!this.state.outerWareHouseObj) {
-      console.log('outer warehouse not designed');
+      console.log("outer warehouse not designed");
       console.log(infoFromModalInputs);
       var shapeModel = getShapeModel({
         shapeType: infoFromModalInputs.shapeType,
@@ -137,41 +167,61 @@ class App extends React.Component {
         width: infoFromModalInputs.width,
         radius: infoFromModalInputs.radius,
         state: this.state,
+        isForWareHouseBorder: true,
+       
       });
       var outerWareHouseObjTemp = new WarehouseBorder(shapeModel);
       this.setState({
-        outerWareHouseObj: outerWareHouseObjTemp,
+        outerWareHouseObj: outerWareHouseObjTemp
       });
     } else {
-      console.log('warehouse is created already. append this sku to it');
-      console.log(infoFromModalInputs.shapeType);
-      var skuUnit = new StorageUnit(infoFromModalInputs.shapeType, 'biscuit');
+      console.log("warehouse is created already. append this sku to it");
+      var shapeModel = getShapeModel({
+        shapeType: infoFromModalInputs.shapeType,
+        length: infoFromModalInputs.length,
+        width: infoFromModalInputs.width,
+        radius: infoFromModalInputs.radius,
+        state: this.state,
+        isForWareHouseBorder: false,
+       
+        
+      });
+      var skuUnit = new StorageUnit(shapeModel, infoFromModalInputs.item);
+      console.log(skuUnit)
       var outerWarehouseObjTemp = this.state.outerWareHouseObj;
       outerWarehouseObjTemp.addNewSkuToList(skuUnit);
       this.setState({
-        outerWareHouseObj: outerWarehouseObjTemp,
+        outerWareHouseObj: outerWarehouseObjTemp
       });
     }
   }
 
   render() {
     return (
-      <div className='wrap'>
+      
+      <div className="wrap">
+        <div>
+          
+        </div>
+
         <ModalComponent
           callbackFn={this.createShapeOnCanvas}
           shapeType={this.state.shapeFormodal}
           isModalVisible={this.state.isModalVisible}
           isCreatingWareHouse={this.state.isCreatingWarehouseBorder}
         />
-        <div className='floatleft'>
+        <div className="floatleft">
           <CanvasComponent
             state={this.state}
             handleDragStart={this.handleDragStart}
             handleDragEnd={this.handleDragEnd}
           />
         </div>
-        <div className='floatright'>
-          <MenuCompponent showModalView={this.showModalView} />
+        <div className="floatright">
+          <MenuCompponent
+            handleSave={this.handleSave}
+            showModalView={this.showModalView}
+          />
         </div>
       </div>
     );

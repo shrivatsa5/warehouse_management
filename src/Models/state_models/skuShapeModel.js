@@ -5,7 +5,7 @@ class StorageUnit {
     this.totalVolume = this.getTotalVolumeForStorageUnit();
     this.volumeRemainingEmpty = this.totalVolume;
   }
-  getTotalVolumeForStorageUnit() {}
+  getTotalVolumeForStorageUnit() { return this.shapeModel.height * this.shapeModel.width * 3;}
 }
 
 module.exports = StorageUnit;
