@@ -1,5 +1,4 @@
 import RectangleModel from './Models/shape_model/rectangleModel';
-import SquareModel from './Models/shape_model/squareModel';
 import CircleModel from './Models/shape_model/circleModel';
 //function takes shapeType and returns shapeModel
 

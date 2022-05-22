@@ -38,5 +38,28 @@ class CircleModel extends GeneralShape {
     console.log(color);
     this.color = color;
   }
+
+  toJson() {
+    return {
+      id: this.id,
+      posX: this.posX,
+      posY: this.posY,
+      radius: this.radius,
+      color: this.color,
+      rotation: this.rotation,
+      shapeType: 'circle',
+    };
+  }
+
+  static fromJson(jsonObj) {
+    var cm = new CircleModel(
+      jsonObj.id,
+      jsonObj.posX,
+      jsonObj.posY,
+      jsonObj.radius,
+      jsonObj.rotation
+    );
+    return cm;
+  }
 }
 export default CircleModel;

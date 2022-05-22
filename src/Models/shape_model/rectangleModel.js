@@ -40,5 +40,31 @@ class RectangleModel extends GeneralShape {
     console.log(color);
     this.color = color;
   }
+
+  toJson() {
+    return {
+      id: this.id,
+      posX: this.posX,
+      posY: this.posY,
+      height: this.height,
+      width: this.width,
+      color: this.color,
+      rotation: this.rotation,
+      shapeType: 'rectangle',
+    };
+  }
+
+  static fromJson(jsonObj) {
+    var rm = new RectangleModel(
+      jsonObj.id,
+      jsonObj.posX,
+      jsonObj.posY,
+      jsonObj.height,
+      jsonObj.width,
+      jsonObj.color,
+      jsonObj.rotation
+    );
+    return rm;
+  }
 }
 export default RectangleModel;

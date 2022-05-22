@@ -1,4 +1,4 @@
-import { Stage, Layer, Rect, Circle } from 'react-konva';
+import { Stage, Layer, Rect, Circle, Text } from 'react-konva';
 const CanvasComponent = (props) => {
   //defining a utility function which after taking necessary data as input returns konva rectangle or circle object
   const getKonvaCoreShapes = (
@@ -25,6 +25,7 @@ const CanvasComponent = (props) => {
           onDragStart={props.handleDragStart}
           onDragEnd={props.handleDragEnd}
           onDblClick={props.handleDoubleClick}
+          t
         />
       );
     } else {
@@ -46,8 +47,8 @@ const CanvasComponent = (props) => {
 
   return (
     <Stage
-      width={props.state.height}
-      height={props.state.width}
+      width={props.state.width}
+      height={props.state.height}
       style={{
         backgroundColor: 'rgb(29, 52, 117)',
         borderRadius: '15px',
