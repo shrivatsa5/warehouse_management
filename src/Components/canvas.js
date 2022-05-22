@@ -49,7 +49,7 @@ const CanvasComponent = (props) => {
       width={props.state.height}
       height={props.state.width}
       style={{
-        backgroundColor: 'pink',
+        backgroundColor: 'rgb(29, 52, 117)',
         borderRadius: '15px',
         overflow: 'hidden',
       }}
@@ -68,7 +68,7 @@ const CanvasComponent = (props) => {
                   props.state.outerWareHouseObj.shapeModel.height,
                   props.state.outerWareHouseObj.shapeModel.width,
                   null,
-                  'red',
+                  'white',
                   props.state.outerWareHouseObj.shapeModel.posX,
                   props.state.outerWareHouseObj.shapeModel.posY
                 );
@@ -81,7 +81,7 @@ const CanvasComponent = (props) => {
                   null,
                   null,
                   props.state.outerWareHouseObj.shapeModel.radius,
-                  'blue',
+                  'white',
                   props.state.outerWareHouseObj.shapeModel.posX,
                   props.state.outerWareHouseObj.shapeModel.posY
                 );
