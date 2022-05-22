@@ -33,6 +33,9 @@ class App extends React.Component {
       isCreatingWarehouseBorder: true,
     };
 
+    //keeping track of all the shapes on which double click has been happened to delete in future when delete key is pressed
+    this.selectedShapeIdsToDelete = [];
+
     //write a function which looks whether any stored outerWarehouse object available or not
 
     window.addEventListener('resize', this.update);
@@ -43,14 +46,18 @@ class App extends React.Component {
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
     this.handleSave = this.handleSave.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleDoubleClick = this.handleDoubleClick.bind(this);
   }
 
   componentDidMount() {
     this.update();
+    document.addEventListener('keydown', this.handleDelete, false);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.update);
+    document.removeEventListener('keydown', this.handleDelete, false);
   }
 
   update = () => {
@@ -62,7 +69,7 @@ class App extends React.Component {
 
   //below call back will be passed to button component as well Modal Component to show modals view
   showModalView(shapeFormodal) {
-    if (this.state.outerWareHouseObj) {
+    if (this.state.outerWareHouseObj != null) {
       this.setState({
         isModalVisible: true,
         shapeFormodal: shapeFormodal,
@@ -76,12 +83,39 @@ class App extends React.Component {
     }
   }
 
+  //function is used to detect when delete key is pressed from keyboard and to delete konva object
+  handleDelete(e) {
+    if (e.key === 'Delete') {
+      alert('Are You sure You want to delete the selected shapes ?');
+      console.log(this.selectedShapeIdsToDelete);
+
+      //first see whether outerwarehouseId exists in selectedshape
+      if (
+        this.selectedShapeIdsToDelete.includes(
+          this.state.outerWareHouseObj.shapeModel.id.toString()
+        )
+      ) {
+        this.setState({
+          outerWareHouseObj: null,
+        });
+      } else {
+        var outerWareHouseObjTemp = this.state.outerWareHouseObj;
+        outerWareHouseObjTemp.skuList = outerWareHouseObjTemp.skuList.filter(
+          (skuUnit) => {
+            return (
+              this.selectedShapeIdsToDelete.includes(skuUnit.shapeModel.id) ===
+              false
+            );
+          }
+        );
+        this.setState({
+          outerWareHouseObj: outerWareHouseObjTemp,
+        });
+      }
+    }
+  }
+
   handleSave() {
-    console.log('taking latest position of outerWareHouseObj');
-    console.log(
-      this.state.outerWareHouseObj.shapeModel.posX,
-      this.state.outerWareHouseObj.shapeModel.posY
-    );
     localStorage.setItem(
       'outerWareHouseObj',
       JSON.stringify(this.state.outerWareHouseObj)
@@ -165,6 +199,32 @@ class App extends React.Component {
     }
   }
 
+  //onDoubleClick shape with that id will get in to selected shape and when delete key is pressed those shape will be deleted
+  handleDoubleClick(e) {
+    const id = e.target.id();
+    console.log(id);
+    if (
+      this.state.outerWareHouseObj.shapeModel.id == id &&
+      this.state.outerWareHouseObj.skuList.lenth > 0
+    ) {
+      console.log('first delete all the inner skus to delete outerwareHouse');
+    } else if (this.state.outerWareHouseObj.shapeModel.id == id) {
+      this.selectedShapeIdsToDelete.push(id);
+    } else {
+      for (var index in this.state.outerWareHouseObj.skuList) {
+        var skuUnit = this.state.outerWareHouseObj.skuList[index];
+        console.log(skuUnit);
+        if (skuUnit.shapeModel.id == id) {
+          if (this.selectedShapeIdsToDelete.includes(id)) {
+            console.log('already present in the list');
+          } else {
+            this.selectedShapeIdsToDelete.push(id);
+          }
+        }
+      }
+    }
+  }
+
   //below function will be passed as a callback to Modal component and will add either outerWareHouse object or inner SKU
   createShapeOnCanvas(infoFromModalInputs) {
     //below line closes the modal
@@ -183,7 +243,10 @@ class App extends React.Component {
         isForWareHouseBorder: true,
       });
 
-      var outerWareHouseObjTemp = new WarehouseBorder(shapeModel);
+      var outerWareHouseObjTemp = new WarehouseBorder(
+        shapeModel,
+        infoFromModalInputs.area
+      );
       this.setState({
         outerWareHouseObj: outerWareHouseObjTemp,
       });
@@ -197,10 +260,12 @@ class App extends React.Component {
         state: this.state,
         isForWareHouseBorder: false,
       });
-      var skuUnit = new StorageUnit(shapeModel, infoFromModalInputs.item);
+      var skuUnit = new StorageUnit(
+        shapeModel,
+        infoFromModalInputs.item,
+        this.state.outerWareHouseObj.ratio
+      );
       var outerWarehouseObjTemp = this.state.outerWareHouseObj;
-      console.log('outerwarehouseObjTemp');
-      console.log(typeof outerWarehouseObjTemp);
       outerWarehouseObjTemp.skuList.push(skuUnit);
       this.setState({
         outerWareHouseObj: outerWarehouseObjTemp,
@@ -224,6 +289,7 @@ class App extends React.Component {
             state={this.state}
             handleDragStart={this.handleDragStart}
             handleDragEnd={this.handleDragEnd}
+            handleDoubleClick={this.handleDoubleClick}
           />
         </div>
         <div className='floatright'>

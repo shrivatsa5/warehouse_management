@@ -24,6 +24,7 @@ const CanvasComponent = (props) => {
           shadowBlur={10}
           onDragStart={props.handleDragStart}
           onDragEnd={props.handleDragEnd}
+          onDblClick={props.handleDoubleClick}
         />
       );
     } else {
@@ -37,6 +38,7 @@ const CanvasComponent = (props) => {
           fill={color}
           onDragStart={props.handleDragStart}
           onDragEnd={props.handleDragEnd}
+          onDblClick={props.handleDoubleClick}
         />
       );
     }
@@ -96,7 +98,7 @@ const CanvasComponent = (props) => {
                   skuUnit.shapeModel.height,
                   skuUnit.shapeModel.width,
                   null,
-                  'red',
+                  skuUnit.shapeModel.color,
                   skuUnit.shapeModel.posX,
                   skuUnit.shapeModel.posY
                 );
@@ -108,7 +110,7 @@ const CanvasComponent = (props) => {
                   null,
                   null,
                   skuUnit.shapeModel.radius,
-                  'blue',
+                  skuUnit.shapeModel.color,
                   skuUnit.shapeModel.posX,
                   skuUnit.shapeModel.posY
                 );

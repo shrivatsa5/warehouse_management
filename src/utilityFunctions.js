@@ -21,15 +21,6 @@ const getShapeModel = (props) => {
       'orange',
       true
     );
-  } else if (props.shapeType === 'square') {
-    return new SquareModel(
-      Math.floor(Math.random() * MAX_RANGE).toString(),
-
-      Math.floor(Math.random() * props.state.width),
-      Math.floor(Math.random() * props.state.height),
-      props.length,
-      'green'
-    );
   } else if (props.shapeType === 'circle') {
     console.log('returning circleModel');
     console.log(props.radius);

@@ -11,6 +11,7 @@ class ModalComponent extends React.Component {
       width: 0,
       radius: 0,
       item: '',
+      area: 0,
     };
 
     this.handleModalSubmit = this.handleModalSubmit.bind(this);
@@ -36,6 +37,7 @@ class ModalComponent extends React.Component {
           shapeType: prevState.shapeType,
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
+          area: prevState.area,
         };
       } else if (name === 'width') {
         return {
@@ -46,6 +48,7 @@ class ModalComponent extends React.Component {
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
           item: prevState.item,
+          area: prevState.area,
         };
       } else if (name === 'radius') {
         return {
@@ -56,6 +59,18 @@ class ModalComponent extends React.Component {
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
           item: prevState.item,
+          area: prevState.area,
+        };
+      } else if (name === 'item') {
+        return {
+          width: prevState.width,
+          radius: prevState.radius,
+          length: prevState.length,
+          shapeType: prevState.shapeType,
+          callbackFn: prevState.callbackFn,
+          isModalVisible: prevState.isModalVisible,
+          item: value,
+          area: prevState.area,
         };
       } else {
         return {
@@ -65,7 +80,8 @@ class ModalComponent extends React.Component {
           shapeType: prevState.shapeType,
           callbackFn: prevState.callbackFn,
           isModalVisible: prevState.isModalVisible,
-          item: value,
+          item: prevState.item,
+          area: value,
         };
       }
     });
@@ -155,7 +171,21 @@ class ModalComponent extends React.Component {
                 )}
               </div>
               <br></br>
-              {!this.props.isCreatingWareHouse && (
+              {this.props.isCreatingWareHouse ? (
+                <div>
+                  <label>
+                    Actual Area:
+                    <div>
+                      <input
+                        type='number'
+                        name='Actual Area'
+                        value={this.state.area}
+                        onChange={this.handleChange}
+                      />
+                    </div>
+                  </label>
+                </div>
+              ) : (
                 <div>
                   <label>
                     Item:
