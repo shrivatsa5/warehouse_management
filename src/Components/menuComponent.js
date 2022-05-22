@@ -29,6 +29,16 @@ const MenuCompponent = (props) => {
           Circle
         </Button>
         <Button onClick={props.handleSave}>Save</Button>
+        <div>
+          <label>Upload invoice</label>
+          <input
+            type="file"
+            name="file"
+            onChange={(e) => {
+              props.handleInvoice(e);
+            }}
+          />
+        </div>
       </ButtonGroup>
     </div>
   );
